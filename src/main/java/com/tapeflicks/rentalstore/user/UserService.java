@@ -1,4 +1,3 @@
 package com.tapeflicks.rentalstore.user;
 
-public class UserService {
-}
+public class UserService {}

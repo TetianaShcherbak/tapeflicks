@@ -1,4 +1,3 @@
 package com.tapeflicks.rentalstore.rental;
 
-public class RentalService {
-}
+public class RentalService {}

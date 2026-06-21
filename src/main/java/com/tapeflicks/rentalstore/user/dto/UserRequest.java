@@ -1,4 +1,3 @@
 package com.tapeflicks.rentalstore.user.dto;
 
-public class UserRequest {
-}
+public class UserRequest {}

@@ -3,15 +3,16 @@ plugins {
 	id("org.springframework.boot") version "3.5.15"
 	id("io.spring.dependency-management") version "1.1.7"
 	id("org.asciidoctor.jvm.convert") version "4.0.5"
+    id("com.diffplug.spotless") version "8.6.0"
 }
 
 group = "com.tapeflicks"
 version = "0.0.1-SNAPSHOT"
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
 }
 
 repositories {
@@ -57,6 +58,15 @@ dependencyManagement {
 	}
 }
 
+spotless {
+    java {
+        googleJavaFormat()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
+
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
@@ -68,4 +78,8 @@ tasks.test {
 tasks.asciidoctor {
 	inputs.dir(project.extra["snippetsDir"]!!)
 	dependsOn(tasks.test)
+}
+
+tasks.named("check") {
+    dependsOn("spotlessCheck")
 }

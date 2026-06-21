@@ -1,4 +1,3 @@
 package com.tapeflicks.rentalstore.movie;
 
-public class MovieController {
-}
+public class MovieController {}
