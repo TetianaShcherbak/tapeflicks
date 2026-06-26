@@ -2,10 +2,22 @@ package com.tapeflicks.rentalstore.user;
 
 import com.tapeflicks.rentalstore.rental.Rental;
 import com.tapeflicks.rentalstore.security.Role;
-import jakarta.persistence.*;
-import java.util.ArrayList;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.util.List;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "users")
@@ -13,6 +25,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 public class User {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +37,6 @@ public class User {
   @Column(nullable = false, unique = true)
   private String email;
 
-  // todo
   @Column(name = "password_hash", nullable = false)
   private String passwordHash;
 
@@ -33,5 +45,5 @@ public class User {
   private Role role;
 
   @OneToMany(mappedBy = "user")
-  private List<Rental> rentals = new ArrayList<>();
+  private List<Rental> rentals;
 }
