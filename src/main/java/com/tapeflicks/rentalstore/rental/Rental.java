@@ -2,9 +2,22 @@ package com.tapeflicks.rentalstore.rental;
 
 import com.tapeflicks.rentalstore.movie.Movie;
 import com.tapeflicks.rentalstore.user.User;
-import jakarta.persistence.*;
-import java.time.LocalDateTime;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import java.time.Instant;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "rentals")
@@ -12,6 +25,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 public class Rental {
 
   @Id
@@ -27,19 +41,15 @@ public class Rental {
   private Movie movie;
 
   @Column(name = "rented_at", nullable = false)
-  private LocalDateTime rentedAt;
+  private Instant rentedAt;
 
   @Column(name = "due_date", nullable = false)
-  private LocalDateTime dueDate;
+  private Instant dueDate;
 
   @Column(name = "returned_at")
-  private LocalDateTime returnedAt;
+  private Instant returnedAt;
 
-  // todo
   @Column(name = "reminder_sent", nullable = false)
+  @Builder.Default
   private boolean reminderSent = false;
-
-  public boolean isActive() {
-    return returnedAt == null;
-  }
 }
