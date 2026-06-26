@@ -19,7 +19,6 @@ public class IdempotencyKeyCleanupJob {
   @Scheduled(cron = "0 0 3 * * *") // Once a day, at 3 AM
   public void cleanupExpiredKeys() {
     Instant cutoff = Instant.now().minus(24, ChronoUnit.HOURS);
-    int deleted = idempotencyRepository.deleteByCreatedAtBefore(cutoff);
-    //        log.info("Cleaned up {} expired idempotency keys older than {}", deleted, cutoff);
+    idempotencyRepository.deleteByCreatedAtBefore(cutoff);
   }
 }

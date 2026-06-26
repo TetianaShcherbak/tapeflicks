@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@SuppressWarnings("java:S1135")
 public class RentalService {
   private final RentalRepository rentalRepository;
   private final IdempotencyKeyService idempotencyKeyService;
@@ -173,8 +174,8 @@ public class RentalService {
    * Verifies that the requesting user is the owner of the requested resource.
    *
    * <p><b>TODO:</b> Currently relies on the token value being passed directly as the user ID
-   * //NOSONAR ({@code fakeExtractUserId}). Once proper JWT authentication is implemented, this
-   * check will enforce real ownership based on the authenticated principal.
+   * ({@code fakeExtractUserId}). Once proper JWT authentication is implemented, this check will
+   * enforce real ownership based on the authenticated principal.
    *
    * @param resourceOwnerId ID of the user who owns the resource
    * @param requestingUserId ID of the user making the request

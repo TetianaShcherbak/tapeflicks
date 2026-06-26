@@ -21,7 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @RequiredArgsConstructor
 @Getter
 @Builder
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial", "java:S4144"})
 public class AppUserDetails implements UserDetails {
 
   private final Long id;

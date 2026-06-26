@@ -31,7 +31,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-class RentalServiceTest_old {
+@SuppressWarnings("java:S8692")
+class RentalServiceTest {
 
   @Mock private RentalRepository rentalRepository;
   @Mock private IdempotencyKeyService idempotencyKeyService;

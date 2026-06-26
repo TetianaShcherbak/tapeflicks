@@ -14,7 +14,7 @@ public class GlobalExceptionHandler {
   private final MessageService messageService;
 
   @ExceptionHandler(NotFoundException.class)
-  public ResponseEntity<?> handle(NotFoundException ex) {
+  public ResponseEntity<?> handle(NotFoundException ex) { // NOSONAR
 
     String message = messageService.getMessage(ex.getErrorCode(), (Object) ex.getArgs());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
