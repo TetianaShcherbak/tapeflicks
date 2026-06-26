@@ -132,21 +132,49 @@ public class RentalService {
     }
 
 
-  @Transactional(readOnly = true)
-  public List<RentalResponse> findAllRentedMoviesByUserId(Long userId) {
-    return null;
-  }
 
-  @Transactional(readOnly = true)
-  public List<RentalResponse> findAllCurrentlyRentedMoviesByUserId(Long userId) {
-      return null;
-  }
+    /**
+     * Retrieves the full rental history for a user, including both active and returned rentals.
+     *
+     * @param userId ID of the user whose rentals to fetch
+     * @return list of {@link RentalResponse} for all rentals belonging to the user, or an empty list
+     *     if none exist
+     */
+    @Transactional(readOnly = true)
+    public List<RentalResponse> findAllRentedMoviesByUserId(Long userId) {
+        List<Rental> rentals = rentalRepository.findAllRentalsByUserId(userId);
+        return prepareResponse(rentals);
+    }
 
-  @Transactional(readOnly = true)
-  public List<RentalResponse> findAllReturnedMoviesByUserId(Long userId) {
-      return null;
-  }
+    /**
+     * Retrieves all active (not yet returned) rentals for a user.
+     *
+     * @param userId ID of the user whose active rentals to fetch
+     * @return list of {@link RentalResponse} for rentals where {@code returnedAt} is null, or an
+     *     empty list if none exist
+     */
+    @Transactional(readOnly = true)
+    public List<RentalResponse> findAllCurrentlyRentedMoviesByUserId(Long userId) {
+        List<Rental> currentRentals = rentalRepository.findAllCurrentRentalsByUserId(userId);
+        return prepareResponse(currentRentals);
+    }
 
+    /**
+     * Retrieves all completed (returned) rentals for a user.
+     *
+     * @param userId ID of the user whose rental history to fetch
+     * @return list of {@link RentalResponse} for rentals where {@code returnedAt} is set, or an empty
+     *     list if none exist
+     */
+    @Transactional(readOnly = true)
+    public List<RentalResponse> findAllReturnedMoviesByUserId(Long userId) {
+        List<Rental> pastRentals = rentalRepository.findAllReturnedMoviesByUserId(userId);
+        return prepareResponse(pastRentals);
+    }
+
+    private List<RentalResponse> prepareResponse(List<Rental> rentals) {
+        return rentals.stream().map(this::prepareResponse).toList();
+    }
 
     private RentalResponse prepareResponse(Rental rental) {
         Movie movie = rental.getMovie();
