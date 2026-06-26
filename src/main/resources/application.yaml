@@ -1,3 +1,25 @@
 spring:
   application:
     name: rentalstore
+
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+
+  flyway:
+    validate-on-migrate: false
+
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: ${SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS:localhost:29092}
+
+server:
+  servlet:
+    context-path: /api/v1
+
+rentalstore:
+  rental:
+    period-days: 3
