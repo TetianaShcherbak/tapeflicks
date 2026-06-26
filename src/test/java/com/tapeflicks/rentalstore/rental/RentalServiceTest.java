@@ -27,6 +27,7 @@ import com.tapeflicks.rentalstore.user.UserService;
 import com.tapeflicks.rentalstore.util.JsonProcessor;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -251,6 +252,56 @@ class RentalServiceTest {
         when(rentalRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThrows(RentalNotFoundException.class, () -> rentalService.returnMovie(999L));
+    }
+
+
+    // ---------- findAll* query methods ----------
+
+    @Test
+    void findAllRentedMoviesByUserId_mapsEntitiesToResponses() {
+        Rental rental =
+                Rental.builder()
+                        .user(user)
+                        .movie(movie)
+                        .rentedAt(Instant.now())
+                        .dueDate(Instant.now())
+                        .build();
+
+        when(rentalRepository.findAllRentalsByUserId(USER_ID)).thenReturn(List.of(rental));
+
+        List<RentalResponse> results = rentalService.findAllRentedMoviesByUserId(USER_ID);
+
+        assertEquals(1, results.size());
+        assertEquals(MOVIE_ID, results.getFirst().movieId());
+    }
+
+    @Test
+    void findAllCurrentlyRentedMoviesByUserId_returnsEmptyList_whenNoneFound() {
+        when(rentalRepository.findAllCurrentRentalsByUserId(USER_ID)).thenReturn(List.of());
+
+        List<RentalResponse> results = rentalService.findAllCurrentlyRentedMoviesByUserId(USER_ID);
+
+        assertEquals(0, results.size());
+    }
+
+    @Test
+    void findAllReturnedMoviesByUserId_mapsEntitiesToResponses() {
+        Rental returnedRental =
+                Rental.builder()
+                        .user(user)
+                        .movie(movie)
+                        .rentedAt(Instant.now())
+                        .dueDate(Instant.now())
+                        .returnedAt(Instant.now())
+                        .build();
+
+        when(rentalRepository.findAllReturnedMoviesByUserId(USER_ID))
+                .thenReturn(List.of(returnedRental));
+
+        List<RentalResponse> results = rentalService.findAllReturnedMoviesByUserId(USER_ID);
+
+        assertEquals(1, results.size());
+        assertNotNull(results.getFirst().returnedAt());
     }
 
 }
