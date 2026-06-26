@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.util.List;
 
 import com.tapeflicks.rentalstore.rental.exception.MovieIsNoLongerAvailableException;
+import com.tapeflicks.rentalstore.rental.exception.RentalNotFoundException;
 import com.tapeflicks.rentalstore.user.User;
 import com.tapeflicks.rentalstore.user.UserService;
 import com.tapeflicks.rentalstore.util.JsonProcessor;
@@ -104,12 +105,31 @@ public class RentalService {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-
-
+    /**
+     * Processes a movie return for the given rental.
+     *
+     * <p>Sets the return timestamp and marks the movie as available again. If the movie was already
+     * returned, returns the current rental state without modification.
+     *
+     * @param rentalId ID of the rental record to close
+     * @return {@link RentalResponse} reflecting the current state of the rental
+     * @throws RentalNotFoundException if no rental exists with the given ID
+     */
     @Transactional
-  public RentalResponse returnMovie(Long rentalId) {
-      return null;
-  }
+    public RentalResponse returnMovie(Long rentalId) {
+        Rental rental =
+                rentalRepository
+                        .findById(rentalId)
+                        .orElseThrow(() -> new RentalNotFoundException(rentalId));
+        if (rental.getReturnedAt() != null) {
+            return prepareResponse(rental); // movie is already returned - return current state
+        }
+        rental.setReturnedAt(Instant.now());
+        Movie movie = rental.getMovie();
+        movie.setAvailable(true);
+        movieService.updateMovie(movie);
+        return prepareResponse(rental);
+    }
 
 
   @Transactional(readOnly = true)
@@ -126,4 +146,17 @@ public class RentalService {
   public List<RentalResponse> findAllReturnedMoviesByUserId(Long userId) {
       return null;
   }
+
+
+    private RentalResponse prepareResponse(Rental rental) {
+        Movie movie = rental.getMovie();
+        return RentalResponse.builder()
+                .userId(rental.getUser().getId())
+                .movieId(movie.getId())
+                .movieTitle(movie.getTitle())
+                .rentedAt(rental.getRentedAt())
+                .dueDate(rental.getDueDate())
+                .returnedAt(rental.getReturnedAt())
+                .build();
+    }
 }
