@@ -33,19 +33,4 @@ public class RentalController {
     }
     return ResponseEntity.ok(rentalResponse);
   }
-
-    @GetMapping("/{id}/rentals")
-    public List<RentalResponse> getAllRentals(@PathVariable Long id) {
-        return rentalService.findAllRentedMoviesByUserId(id);
-    }
-
-    @GetMapping("/{id}/rentals/active")
-    public List<RentalResponse> getActiveRentals(@PathVariable Long id) {
-        return rentalService.findAllCurrentlyRentedMoviesByUserId(id);
-    }
-
-    @GetMapping("/{id}/rentals/returned")
-    public List<RentalResponse> getReturnedRentals(@PathVariable Long id) {
-        return rentalService.findAllReturnedMoviesByUserId(id);
-    }
 }
