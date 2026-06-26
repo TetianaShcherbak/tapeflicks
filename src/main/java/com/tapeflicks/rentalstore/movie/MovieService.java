@@ -12,64 +12,64 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class MovieService {
-    private final MovieRepository movieRepository;
 
-    // PATCH
-    @Transactional
-    public MovieResponse updateMovie(MovieRequest request) {
-        Movie movie =
-                movieRepository
-                        .findById(request.id())
-                        .orElseThrow(() -> new MovieNotFoundException(request.id()));
-        if (!request.title().isEmpty())
-            movie.setTitle(request.title());
-        if (!request.genre().isEmpty()) movie.setGenre(request.genre());
-        movie.setAvailable(request.available());
-        movieRepository.save(movie);
+  private final MovieRepository movieRepository;
 
-        return MovieResponse.builder()
-                .id(movie.getId())
-                .title(movie.getTitle())
-                .genre(movie.getGenre())
-                .available(movie.isAvailable())
-                .build();
-    }
+  // PATCH
+  @Transactional
+  public MovieResponse updateMovie(MovieRequest request) {
+    Movie movie =
+        movieRepository
+            .findById(request.id())
+            .orElseThrow(() -> new MovieNotFoundException(request.id()));
+    if (!request.title().isEmpty()) movie.setTitle(request.title());
+    if (!request.genre().isEmpty()) movie.setGenre(request.genre());
+    movie.setAvailable(request.available());
+    movieRepository.save(movie);
 
-    // PUT
-    @Transactional
-    public MovieResponse updateMovie(Movie movie) {
-        Movie movieRecord =
-                movieRepository
-                        .findById(movie.getId())
-                        .orElseThrow(() -> new MovieNotFoundException(movie.getId()));
-        movieRepository.save(movieRecord);
+    return MovieResponse.builder()
+        .id(movie.getId())
+        .title(movie.getTitle())
+        .genre(movie.getGenre())
+        .available(movie.isAvailable())
+        .build();
+  }
 
-        return MovieResponse.builder()
-                .id(movie.getId())
-                .title(movie.getTitle())
-                .genre(movie.getGenre())
-                .available(movie.isAvailable())
-                .build();
-    }
+  // PUT
+  @Transactional
+  public MovieResponse updateMovie(Movie movie) {
+    Movie movieRecord =
+        movieRepository
+            .findById(movie.getId())
+            .orElseThrow(() -> new MovieNotFoundException(movie.getId()));
+    movieRepository.save(movieRecord);
 
-    public boolean isMovieAvailable(Long movieId) {
-        Movie movie =
-                movieRepository.findById(movieId).orElseThrow(() -> new MovieNotFoundException(movieId));
+    return MovieResponse.builder()
+        .id(movie.getId())
+        .title(movie.getTitle())
+        .genre(movie.getGenre())
+        .available(movie.isAvailable())
+        .build();
+  }
 
-        return movie.isAvailable();
-    }
+  public boolean isMovieAvailable(Long movieId) {
+    Movie movie =
+        movieRepository.findById(movieId).orElseThrow(() -> new MovieNotFoundException(movieId));
 
-    public Movie getMovie(Long id) {
-        return movieRepository.findById(id).orElseThrow(() -> new MovieNotFoundException(id));
-    }
+    return movie.isAvailable();
+  }
 
-    public MovieResponse getMovieResponse(Long id) {
-        Movie movie = getMovie(id);
-        return MovieResponse.builder()
-                .id(id)
-                .title(movie.getTitle())
-                .genre(movie.getGenre())
-                .available(movie.isAvailable())
-                .build();
-    }
+  public Movie getMovie(Long id) {
+    return movieRepository.findById(id).orElseThrow(() -> new MovieNotFoundException(id));
+  }
+
+  public MovieResponse getMovieResponse(Long id) {
+    Movie movie = getMovie(id);
+    return MovieResponse.builder()
+        .id(id)
+        .title(movie.getTitle())
+        .genre(movie.getGenre())
+        .available(movie.isAvailable())
+        .build();
+  }
 }
