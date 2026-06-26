@@ -17,14 +17,18 @@ import com.tapeflicks.rentalstore.idempotency.IdempotencyKey;
 import com.tapeflicks.rentalstore.idempotency.IdempotencyKeyService;
 import com.tapeflicks.rentalstore.movie.Movie;
 import com.tapeflicks.rentalstore.movie.MovieService;
+import com.tapeflicks.rentalstore.movie.dto.MovieRequest;
 import com.tapeflicks.rentalstore.rental.dto.RentalRequest;
 import com.tapeflicks.rentalstore.rental.dto.RentalResponse;
 import com.tapeflicks.rentalstore.rental.exception.MovieIsNoLongerAvailableException;
+import com.tapeflicks.rentalstore.rental.exception.RentalNotFoundException;
 import com.tapeflicks.rentalstore.user.User;
 import com.tapeflicks.rentalstore.user.UserService;
 import com.tapeflicks.rentalstore.util.JsonProcessor;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -193,4 +197,60 @@ class RentalServiceTest {
     assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.getStatusCode());
     verify(rentalRepository, never()).save(any(Rental.class));
   }
+
+    // ---------- returnMovie ----------
+
+    @Test
+    void returnMovie_setsReturnedAtAndFreesMovie_whenRentalIsActive() {
+        Rental rental =
+                Rental.builder()
+                        .user(user)
+                        .movie(movie)
+                        .rentedAt(Instant.now())
+                        .dueDate(Instant.now())
+                        .build();
+        movie.setAvailable(false);
+
+        when(rentalRepository.findById(10L)).thenReturn(Optional.of(rental));
+
+        RentalResponse response = rentalService.returnMovie(10L);
+
+        assertNotNull(rental.getReturnedAt());
+        assertTrue(movie.isAvailable());
+        verify(movieService, times(1)).updateMovie(movie);
+        assertEquals(USER_ID, response.userId());
+        assertEquals(MOVIE_ID, response.movieId());
+    }
+
+    @Test
+    void returnMovie_returnsNull_whenRentalAlreadyReturned() {
+        Rental rental =
+                Rental.builder()
+                        .user(user)
+                        .movie(movie)
+                        .rentedAt(Instant.now())
+                        .dueDate(Instant.now())
+                        .returnedAt(Instant.now())
+                        .build();
+
+        when(rentalRepository.findById(10L)).thenReturn(Optional.of(rental));
+
+        RentalResponse response = rentalService.returnMovie(10L);
+
+        assertEquals(response.userId(), rental.getUser().getId());
+        assertEquals(response.movieId(), rental.getMovie().getId());
+        assertEquals(response.rentedAt(), rental.getRentedAt());
+        assertEquals(response.dueDate(), rental.getDueDate());
+        assertEquals(response.returnedAt(), rental.getReturnedAt());
+
+        verify(movieService, never()).updateMovie((MovieRequest) any());
+    }
+
+    @Test
+    void returnMovie_throwsException_whenRentalDoesNotExist() {
+        when(rentalRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(RentalNotFoundException.class, () -> rentalService.returnMovie(999L));
+    }
+
 }

@@ -4,5 +4,6 @@ import lombok.Getter;
 
 @Getter
 public enum ErrorCode {
-  USER_NOT_FOUND;
+    MOVIE_NOT_FOUND,
+    USER_NOT_FOUND;
 }
